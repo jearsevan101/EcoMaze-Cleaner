@@ -6,17 +6,15 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed;
-
     public float groundDrag;
-
     public float jumpForce;
     public float jumpCooldown;
     public float airMultiplier;
     bool readyToJump;
 
-
     [Header("KeyBinds")]
     public KeyCode jumpKey = KeyCode.Space;
+    public KeyCode interactKey = KeyCode.E; // Key to pick up trash
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -32,6 +30,11 @@ public class PlayerMovement : MonoBehaviour
 
     Rigidbody rb;
 
+    [Header("Trash Collection")]
+    public int maxTrashCapacity = 2; // Max trash items the player can carry
+    public List<TrashData> carriedTrash = new List<TrashData>(); // List of collected trash
+    public List<Trash> carriedTrashObjects = new List<Trash>(); // List of Trash objects (GameObjects)
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -43,6 +46,7 @@ public class PlayerMovement : MonoBehaviour
     {
         MovePlayer();
     }
+
     private void Update()
     {
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
@@ -58,6 +62,8 @@ public class PlayerMovement : MonoBehaviour
         {
             rb.drag = 0;
         }
+
+        HandleInteraction(); // Check for trash pickup
     }
 
     private void MyInput()
@@ -67,7 +73,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
-            readyToJump= false;
+            readyToJump = false;
 
             Jump();
 
@@ -85,7 +91,6 @@ public class PlayerMovement : MonoBehaviour
         else if (!grounded)
         {
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
-
         }
     }
 
@@ -95,7 +100,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (flatVel.magnitude > moveSpeed)
         {
-            Vector3 limitedVel = flatVel.normalized*moveSpeed;
+            Vector3 limitedVel = flatVel.normalized * moveSpeed;
             rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
     }
@@ -108,6 +113,36 @@ public class PlayerMovement : MonoBehaviour
 
     private void ResetJump()
     {
-        readyToJump= true;
+        readyToJump = true;
+    }
+
+    private void HandleInteraction()
+    {
+        // Check for interact key press
+        if (Input.GetKeyDown(interactKey))
+        {
+            Collider[] hits = Physics.OverlapSphere(transform.position, 1.5f); // Interaction radius
+
+            foreach (Collider hit in hits)
+            {
+                Trash trash = hit.GetComponent<Trash>();
+                if (trash != null)
+                {
+                    if (carriedTrash.Count < maxTrashCapacity)
+                    {
+                        // Pick up the trash
+                        carriedTrash.Add(trash.trashData);  // Add TrashData to the list
+                        carriedTrashObjects.Add(trash);  // Add Trash object (GameObject) to the list
+                        Destroy(hit.gameObject); // Remove the trash object from the scene
+                        Debug.Log($"Picked up {trash.trashData.trashName}");
+                    }
+                    else
+                    {
+                        Debug.Log("Trash capacity reached!");
+                    }
+                    break; // Stop checking after picking up one item
+                }
+            }
+        }
     }
 }
