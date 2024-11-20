@@ -135,6 +135,7 @@ public class PlayerMovement : MonoBehaviour
                         carriedTrashObjects.Add(trash);  // Add Trash object (GameObject) to the list
                         Destroy(hit.gameObject); // Remove the trash object from the scene
                         Debug.Log($"Picked up {trash.trashData.trashName}");
+                        Debug.Log($"Carried trash {carriedTrash}");
                     }
                     else
                     {

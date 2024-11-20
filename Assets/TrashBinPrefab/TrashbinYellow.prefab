@@ -30,8 +30,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7310249193433067462}
   - {fileID: 4974342283443286118}
@@ -100,6 +100,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trashBinData: {fileID: 11400000, guid: eb5fcc0e0205a62488e96c159879c1db, type: 2}
+  interactionRadius: 1.5
+  interactKey: 101
 --- !u!65 &1218206765427496945
 BoxCollider:
   m_ObjectHideFlags: 0
