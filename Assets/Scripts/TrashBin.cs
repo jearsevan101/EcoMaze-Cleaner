@@ -5,6 +5,7 @@ using UnityEngine;
 public class TrashBin : MonoBehaviour
 {
     public TrashBinData trashBinData; // ScriptableObject to define the bin's properties
+    public Checkpoint4Handler checkpoint4Handler;
 
     [Header("Interaction")]
     public float interactionRadius = 1.5f; // Interaction radius
@@ -49,11 +50,13 @@ public class TrashBin : MonoBehaviour
 
                 if (carriedTrash.trashType == closestBin.trashBinData.acceptedType)
                 {
+                    checkpoint4Handler.OnTrashDisposed();
                     ScoreManager.Instance.AddScore(closestBin.trashBinData.pointsForCorrectTrash);
                     Debug.Log("Correct trash deposited!");
                 }
                 else
                 {
+                    checkpoint4Handler.OnTrashDisposed();
                     ScoreManager.Instance.AddScore(closestBin.trashBinData.penaltyForWrongTrash);
                     Debug.Log("Wrong trash deposited!");
                 }
