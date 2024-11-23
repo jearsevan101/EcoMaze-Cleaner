@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro; // Add TextMeshPro namespace
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -10,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce;
     public float jumpCooldown;
     public float airMultiplier;
+    public bool canMove = true; // Movement control flag
     bool readyToJump;
 
     [Header("KeyBinds")]
@@ -35,24 +37,36 @@ public class PlayerMovement : MonoBehaviour
     public List<TrashData> carriedTrash = new List<TrashData>(); // List of collected trash
     public List<Trash> carriedTrashObjects = new List<Trash>(); // List of Trash objects (GameObjects)
 
+    [Header("UI")]
+    public TextMeshProUGUI statusText; // Reference to the TextMeshPro UI component
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
         readyToJump = true;
+
+        // Clear status text at the start
+        if (statusText != null) statusText.text = string.Empty;
     }
 
     private void FixedUpdate()
     {
-        MovePlayer();
+        if (canMove)
+        {
+            MovePlayer();
+        }
     }
 
     private void Update()
     {
         grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
-        MyInput();
-        SpeedControl();
+        if (canMove)
+        {
+            MyInput();
+            SpeedControl();
+        }
 
         if (grounded)
         {
@@ -84,6 +98,7 @@ public class PlayerMovement : MonoBehaviour
     private void MovePlayer()
     {
         moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
+
         if (grounded)
         {
             rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
@@ -144,6 +159,27 @@ public class PlayerMovement : MonoBehaviour
                     break; // Stop checking after picking up one item
                 }
             }
+        }
+    }
+
+    public void UpdateStatus(string message, float duration)
+    {
+        StartCoroutine(DisplayStatus(message, duration));
+    }
+
+    private IEnumerator DisplayStatus(string message, float duration)
+    {
+        if (statusText != null)
+        {
+            statusText.text = message;
+        }
+
+        yield return new WaitForSeconds(duration);
+
+        if (statusText != null)
+        {
+            yield return new WaitForSeconds(3f); // Wait for 3 seconds before clearing
+            statusText.text = string.Empty;
         }
     }
 }
