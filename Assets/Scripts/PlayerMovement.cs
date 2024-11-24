@@ -57,8 +57,11 @@ public class PlayerMovement : MonoBehaviour
     [Header("Audio")]
     public AudioSource walkingAudioSource;
     public AudioSource jumpAudioSource;
+    public AudioSource grabAudioSource;
     public AudioClip walkingClip;
     public AudioClip jumpClip;
+    public AudioClip grabClip;
+    public AudioClip dropClip;
 
     private void Start()
     {
@@ -252,6 +255,18 @@ public class PlayerMovement : MonoBehaviour
                 trashCollider.enabled = true;
             }
 
+            // Play the drop sound
+            if (grabAudioSource != null && dropClip != null)
+            {
+                grabAudioSource.clip = dropClip;
+                grabAudioSource.time = 0.2f;
+                grabAudioSource.Play();
+            }
+            else
+            {
+                Debug.LogWarning("Drop sound not set!");
+            }
+
             // Shift remaining trash
             StartCoroutine(ShiftTrashWithDelay());
         }
@@ -371,6 +386,16 @@ public class PlayerMovement : MonoBehaviour
                     }
 
                     Debug.Log($"Picked up {closestTrash.trashData.trashName}");
+
+                    // play the grab sound
+                    if (grabAudioSource != null && grabClip != null)
+                    {
+                        grabAudioSource.PlayOneShot(grabClip);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Grab sound not set!");
+                    }
                 }
                 else
                 {
