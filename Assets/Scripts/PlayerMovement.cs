@@ -54,6 +54,15 @@ public class PlayerMovement : MonoBehaviour
     [Header("Interaction")]
     public float pickupRadius = 1.5f;
 
+    [Header("Audio")]
+    public AudioSource walkingAudioSource;
+    public AudioSource jumpAudioSource;
+    public AudioSource grabAudioSource;
+    public AudioClip walkingClip;
+    public AudioClip jumpClip;
+    public AudioClip grabClip;
+    public AudioClip dropClip;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -65,6 +74,13 @@ public class PlayerMovement : MonoBehaviour
 
         // Clear status text at start
         if (statusText != null) statusText.text = string.Empty;
+        
+        //setup walking audio
+        if (walkingAudioSource != null)
+        {
+            walkingAudioSource.clip = walkingClip;
+            walkingAudioSource.loop = true;
+        }
     }
 
 
@@ -89,10 +105,25 @@ public class PlayerMovement : MonoBehaviour
         if (grounded)
         {
             rb.drag = groundDrag;
+
+            // play the walking sound
+            if (( horizontalInput != 0 || verticalInput != 0) && !walkingAudioSource.isPlaying)
+            {
+                walkingAudioSource.Play();
+            }
+            else if (horizontalInput == 0 && verticalInput == 0)
+            {
+                walkingAudioSource.Pause();
+            }
         }
         else
         {
             rb.drag = 0;
+
+            if (walkingAudioSource.isPlaying)
+            {
+                walkingAudioSource.Pause();
+            }
         }
 
         RotateObjectParent(); // Rotate objectParent
@@ -224,6 +255,18 @@ public class PlayerMovement : MonoBehaviour
                 trashCollider.enabled = true;
             }
 
+            // Play the drop sound
+            if (grabAudioSource != null && dropClip != null)
+            {
+                grabAudioSource.clip = dropClip;
+                grabAudioSource.time = 0.2f;
+                grabAudioSource.Play();
+            }
+            else
+            {
+                Debug.LogWarning("Drop sound not set!");
+            }
+
             // Shift remaining trash
             StartCoroutine(ShiftTrashWithDelay());
         }
@@ -280,6 +323,15 @@ public class PlayerMovement : MonoBehaviour
     {
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+
+        // Play jump sound
+        if (jumpAudioSource != null && jumpClip != null)
+        {
+            Debug.Log("PLAYING JUMP SOUND");
+            jumpAudioSource.PlayOneShot(jumpClip);
+        }
+        else
+        { Debug.LogWarning("Jump sound not set!");}
     }
 
     private void ResetJump()
@@ -334,6 +386,16 @@ public class PlayerMovement : MonoBehaviour
                     }
 
                     Debug.Log($"Picked up {closestTrash.trashData.trashName}");
+
+                    // play the grab sound
+                    if (grabAudioSource != null && grabClip != null)
+                    {
+                        grabAudioSource.PlayOneShot(grabClip);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Grab sound not set!");
+                    }
                 }
                 else
                 {
