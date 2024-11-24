@@ -56,7 +56,9 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Audio")]
     public AudioSource walkingAudioSource;
+    public AudioSource jumpAudioSource;
     public AudioClip walkingClip;
+    public AudioClip jumpClip;
 
     private void Start()
     {
@@ -306,6 +308,15 @@ public class PlayerMovement : MonoBehaviour
     {
         rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
+
+        // Play jump sound
+        if (jumpAudioSource != null && jumpClip != null)
+        {
+            Debug.Log("PLAYING JUMP SOUND");
+            jumpAudioSource.PlayOneShot(jumpClip);
+        }
+        else
+        { Debug.LogWarning("Jump sound not set!");}
     }
 
     private void ResetJump()
