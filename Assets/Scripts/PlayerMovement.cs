@@ -54,6 +54,10 @@ public class PlayerMovement : MonoBehaviour
     [Header("Interaction")]
     public float pickupRadius = 1.5f;
 
+    [Header("Audio")]
+    public AudioSource walkingAudioSource;
+    public AudioClip walkingClip;
+
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -65,6 +69,13 @@ public class PlayerMovement : MonoBehaviour
 
         // Clear status text at start
         if (statusText != null) statusText.text = string.Empty;
+        
+        //setup walking audio
+        if (walkingAudioSource != null)
+        {
+            walkingAudioSource.clip = walkingClip;
+            walkingAudioSource.loop = true;
+        }
     }
 
 
@@ -89,10 +100,25 @@ public class PlayerMovement : MonoBehaviour
         if (grounded)
         {
             rb.drag = groundDrag;
+
+            // play the walking sound
+            if (( horizontalInput != 0 || verticalInput != 0) && !walkingAudioSource.isPlaying)
+            {
+                walkingAudioSource.Play();
+            }
+            else if (horizontalInput == 0 && verticalInput == 0)
+            {
+                walkingAudioSource.Pause();
+            }
         }
         else
         {
             rb.drag = 0;
+
+            if (walkingAudioSource.isPlaying)
+            {
+                walkingAudioSource.Pause();
+            }
         }
 
         RotateObjectParent(); // Rotate objectParent
