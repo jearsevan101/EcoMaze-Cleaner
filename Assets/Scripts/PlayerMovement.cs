@@ -115,12 +115,6 @@ public class PlayerMovement : MonoBehaviour
             Quaternion.identity,
             collisionCheckMask
         );
-        Collider[] colliders2 = Physics.OverlapBox(
-            position,
-            Vector3.one * 0.1f, // Small box size for point check
-            Quaternion.identity,
-            collisionCheckMask2
-        );
 
         foreach (Collider collider in colliders)
         {
@@ -129,13 +123,7 @@ public class PlayerMovement : MonoBehaviour
                 return true;
             }
         }
-        foreach (Collider collider in colliders2)
-        {
-            if (collider is BoxCollider)
-            {
-                return true;
-            }
-        }
+
         return false;
     }
 
