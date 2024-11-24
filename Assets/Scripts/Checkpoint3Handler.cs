@@ -11,7 +11,7 @@ public class Checkpoint3Handler : MonoBehaviour
     public PlayerMovement playerMovement;
     public void OnTrashPickedUp()
     {
-        currentTrashPickup = playerMovement.carriedTrash.Count;
+        currentTrashPickup = playerMovement.GetCurrentTrashCount();
         Debug.Log("Trash picked up: " + currentTrashPickup);
 
         if (currentTrashPickup >= requiredTrashPickup)

@@ -11,34 +11,48 @@ public class PlayerMovement : MonoBehaviour
     public float jumpForce;
     public float jumpCooldown;
     public float airMultiplier;
-    public bool canMove = true; // Movement control flag
-    bool readyToJump;
+    public bool canMove = true;
+    private bool readyToJump;
 
     [Header("KeyBinds")]
     public KeyCode jumpKey = KeyCode.Space;
-    public KeyCode interactKey = KeyCode.E; // Key to pick up trash
+    public KeyCode interactKey = KeyCode.E;
+    public KeyCode dropKey = KeyCode.Q;
 
     [Header("Ground Check")]
     public float playerHeight;
     public LayerMask whatIsGround;
-    bool grounded;
+    private bool grounded;
 
     public Transform orientation;
 
-    float horizontalInput;
-    float verticalInput;
+    [Header("Object Rotation")]
+    [SerializeField] private Transform objectParent;
 
-    Vector3 moveDirection;
+    [Header("Trash Placement")]
+    [SerializeField] private Transform trashSlot1;
+    [SerializeField] private Transform trashSlot2;
+    [SerializeField] private Transform trashSlot3;
+    [SerializeField] private Transform trashSlot4;
 
-    Rigidbody rb;
+    // Make trashSlots public so TrashBin can access it
+    public Transform[] trashSlots { get; private set; }
+    [Header("Drop Setting")]
+    public Transform trashParent;
+    public float dropDistance = 2f;
+    public float dropHeightCheck = 1f; // Height for checking collisions
+    public LayerMask collisionCheckMask;
+    public LayerMask collisionCheckMask2;
 
-    [Header("Trash Collection")]
-    public int maxTrashCapacity = 2; // Max trash items the player can carry
-    public List<TrashData> carriedTrash = new List<TrashData>(); // List of collected trash
-    public List<Trash> carriedTrashObjects = new List<Trash>(); // List of Trash objects (GameObjects)
+    private float horizontalInput;
+    private float verticalInput;
+    private Vector3 moveDirection;
+    private Rigidbody rb;
 
     [Header("UI")]
-    public TextMeshProUGUI statusText; // Reference to the TextMeshPro UI component
+    public TextMeshProUGUI statusText;
+    [Header("Interaction")]
+    public float pickupRadius = 1.5f;
 
     private void Start()
     {
@@ -46,9 +60,13 @@ public class PlayerMovement : MonoBehaviour
         rb.freezeRotation = true;
         readyToJump = true;
 
-        // Clear status text at the start
+        // Initialize trash slots array
+        trashSlots = new Transform[] { trashSlot1, trashSlot2, trashSlot3, trashSlot4 };
+
+        // Clear status text at start
         if (statusText != null) statusText.text = string.Empty;
     }
+
 
     private void FixedUpdate()
     {
@@ -77,9 +95,159 @@ public class PlayerMovement : MonoBehaviour
             rb.drag = 0;
         }
 
+        RotateObjectParent(); // Rotate objectParent
         HandleInteraction(); // Check for trash pickup
+        HandleDrop(); // Add this new method call
+    }
+    private void HandleDrop()
+    {
+        if (Input.GetKeyDown(dropKey))
+        {
+            DropFirstTrash();
+        }
+    }
+    private bool IsPositionInsideBoxCollider(Vector3 position)
+    {
+        // Create a small overlap box at the position
+        Collider[] colliders = Physics.OverlapBox(
+            position,
+            Vector3.one * 0.1f, // Small box size for point check
+            Quaternion.identity,
+            collisionCheckMask
+        );
+        Collider[] colliders2 = Physics.OverlapBox(
+            position,
+            Vector3.one * 0.1f, // Small box size for point check
+            Quaternion.identity,
+            collisionCheckMask2
+        );
+
+        foreach (Collider collider in colliders)
+        {
+            if (collider is BoxCollider)
+            {
+                return true;
+            }
+        }
+        foreach (Collider collider in colliders2)
+        {
+            if (collider is BoxCollider)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
+    private Vector3 FindValidDropPosition(Vector3 initialPosition)
+    {
+        Vector3 dropPosition = initialPosition;
+        float checkRadius = 1f; // Start checking 1 unit around
+        int maxAttempts = 8; // Maximum number of positions to check
+        float angleStep = 45f; // Check every 45 degrees around the point
+
+        // First check the initial position
+        if (!IsPositionInsideBoxCollider(dropPosition))
+        {
+            return dropPosition;
+        }
+
+        // If initial position is invalid, check in a circular pattern
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            float angle = i * angleStep;
+            float radian = angle * Mathf.Deg2Rad;
+
+            Vector3 offset = new Vector3(
+                Mathf.Cos(radian) * checkRadius,
+                0f,
+                Mathf.Sin(radian) * checkRadius
+            );
+
+            Vector3 testPosition = initialPosition + offset;
+
+            if (!IsPositionInsideBoxCollider(testPosition))
+            {
+                return testPosition;
+            }
+        }
+
+        // If no valid position found, return the original position
+        // You might want to handle this case differently
+        return initialPosition;
+    }
+
+    private void DropFirstTrash()
+    {
+        if (trashSlots[0].childCount > 0)
+        {
+            Transform trashTransform = trashSlots[0].GetChild(0);
+
+            // Calculate the direction and intended drop position
+            Vector3 dropDirection = orientation.forward;
+            dropDirection.y = 0; // Keep the drop direction on the horizontal plane
+            dropDirection = dropDirection.normalized;
+
+            // Use the player's x, z position and set y to 0
+            Vector3 intendedDropPosition = new Vector3(
+                transform.position.x + dropDirection.x * dropDistance,
+                0f, // Force y position to 0
+                transform.position.z + dropDirection.z * dropDistance
+            );
+
+            // Perform a raycast to check for obstacles between the player and the intended drop position
+            RaycastHit hit;
+            bool hasObstacle = Physics.Raycast(
+                transform.position + Vector3.up * 0.5f, // Start slightly above the ground to avoid floor collisions
+                dropDirection,
+                out hit,
+                dropDistance,
+                collisionCheckMask // Layer mask for obstacles
+            );
+
+            // If there's an obstacle, place the trash in front of the obstacle instead of the intended position
+            Vector3 finalDropPosition;
+            if (hasObstacle)
+            {
+                finalDropPosition = hit.point - dropDirection * 0.5f; // Slightly pull back from the obstacle
+                finalDropPosition.y = 0f; // Ensure the Y position is set to 0
+            }
+            else
+            {
+                finalDropPosition = intendedDropPosition;
+            }
+
+            // Reparent the trash object and position it at the calculated drop position
+            trashTransform.SetParent(trashParent);
+            trashTransform.position = finalDropPosition;
+            trashTransform.rotation = Quaternion.identity;
+            trashTransform.localScale = Vector3.one * 3f; // Set the scale to 3
+
+            // Enable physics and collider for the dropped object
+            Rigidbody trashRb = trashTransform.GetComponent<Rigidbody>();
+            if (trashRb != null)
+            {
+                trashRb.isKinematic = false;
+            }
+
+            Collider trashCollider = trashTransform.GetComponent<Collider>();
+            if (trashCollider != null)
+            {
+                trashCollider.enabled = true;
+            }
+
+            // Shift remaining trash
+            StartCoroutine(ShiftTrashWithDelay());
+        }
+    }
+    private void RotateObjectParent()
+    {
+        if (objectParent != null)
+        {
+            float yRotation = orientation.eulerAngles.y; // Get camera's Y rotation
+            objectParent.rotation = Quaternion.Euler(0, yRotation, 0); // Rotate objectParent
+        }
+    }
     private void MyInput()
     {
         horizontalInput = Input.GetAxisRaw("Horizontal");
@@ -133,35 +301,124 @@ public class PlayerMovement : MonoBehaviour
 
     private void HandleInteraction()
     {
-        // Check for interact key press
         if (Input.GetKeyDown(interactKey))
         {
-            Collider[] hits = Physics.OverlapSphere(transform.position, 1.5f); // Interaction radius
+            // Find closest trash within pickup radius
+            Collider[] hits = Physics.OverlapSphere(transform.position, pickupRadius);
+            float closestDistance = float.MaxValue;
+            Trash closestTrash = null;
 
             foreach (Collider hit in hits)
             {
                 Trash trash = hit.GetComponent<Trash>();
                 if (trash != null)
                 {
-                    if (carriedTrash.Count < maxTrashCapacity)
+                    float distance = Vector3.Distance(transform.position, hit.transform.position);
+                    if (distance < closestDistance)
                     {
-                        // Pick up the trash
-                        carriedTrash.Add(trash.trashData);  // Add TrashData to the list
-                        carriedTrashObjects.Add(trash);  // Add Trash object (GameObject) to the list
-                        Destroy(hit.gameObject); // Remove the trash object from the scene
-                        Debug.Log($"Picked up {trash.trashData.trashName}");
-                        Debug.Log($"Carried trash {carriedTrash}");
+                        closestDistance = distance;
+                        closestTrash = trash;
                     }
-                    else
+                }
+            }
+
+            if (closestTrash != null)
+            {
+                Transform emptySlot = GetEmptyTrashSlot();
+                if (emptySlot != null)
+                {
+                    // Parent the trash to the slot and reset its local position
+                    Collider collider = closestTrash.GetComponent<Collider>();
+                    if (collider != null)
                     {
-                        Debug.Log("Trash capacity reached!");
+                        collider.enabled = false; // Disables the collider
                     }
-                    break; // Stop checking after picking up one item
+                    closestTrash.transform.SetParent(emptySlot);
+                    closestTrash.transform.localPosition = new Vector3(0f, 0f, 1f);
+                    closestTrash.transform.localRotation = Quaternion.identity;
+                    closestTrash.transform.localScale = closestTrash.transform.localScale * 0.5f;
+
+                    // Disable physics on the trash object
+                    Rigidbody trashRb = closestTrash.GetComponent<Rigidbody>();
+                    if (trashRb != null)
+                    {
+                        trashRb.isKinematic = true;
+                    }
+
+                    Debug.Log($"Picked up {closestTrash.trashData.trashName}");
+                }
+                else
+                {
+                    Debug.Log("Inventory is full!");
                 }
             }
         }
     }
+    public void DestroyFirstTrash()
+    {
+        if (trashSlots[0].childCount != 0)
+        {
+            // Get the first child of the first trash slot
+            Transform trashTransform = trashSlots[0].GetChild(0);
 
+            // Destroy the GameObject
+            Destroy(trashTransform.gameObject);
+
+            // Shift remaining trash objects
+            StartCoroutine(ShiftTrashWithDelay());
+        }
+
+    }
+    private IEnumerator ShiftTrashWithDelay()
+    {
+        // Wait until the next frame to ensure the object is destroyed
+        yield return null;
+
+        // Now shift the remaining trash
+        ShiftTrashAfterDisposal();
+    }
+    public int GetCurrentTrashCount()
+    {
+        int count = 0;
+        foreach (Transform slot in trashSlots)
+        {
+            if (slot.childCount > 0)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    private Transform GetEmptyTrashSlot()
+    {
+        foreach (Transform slot in trashSlots)
+        {
+            if (slot.childCount == 0)
+            {
+                return slot;
+            }
+        }
+        return null;
+    }
+
+    public void ShiftTrashAfterDisposal()
+    {
+        // Loop through the trash slots
+        for (int i = 0; i < trashSlots.Length - 1; i++)
+        {
+            Transform currentSlot = trashSlots[i];
+            Transform nextSlot = trashSlots[i + 1];
+
+            // If current slot is empty and the next slot has trash, move it to the current slot
+            if (currentSlot.childCount == 0 && nextSlot.childCount > 0)
+            {
+                Transform trashToMove = nextSlot.GetChild(0); // Get the first trash object
+                trashToMove.SetParent(currentSlot);          // Reparent to current slot
+                trashToMove.localPosition = new Vector3(0f, 0f, 1f);
+                trashToMove.localRotation = Quaternion.identity; // Reset rotation
+            }
+        }
+    }
     public void UpdateStatus(string message, float duration)
     {
         StartCoroutine(DisplayStatus(message, duration));
@@ -172,14 +429,15 @@ public class PlayerMovement : MonoBehaviour
         if (statusText != null)
         {
             statusText.text = message;
-        }
-
-        yield return new WaitForSeconds(duration);
-
-        if (statusText != null)
-        {
-            yield return new WaitForSeconds(3f); // Wait for 3 seconds before clearing
+            yield return new WaitForSeconds(duration);
+            yield return new WaitForSeconds(3f);
             statusText.text = string.Empty;
         }
+    }
+    private void OnDrawGizmosSelected()
+    {
+        // Visualize pickup radius in editor
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, pickupRadius);
     }
 }

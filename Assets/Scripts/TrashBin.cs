@@ -4,20 +4,32 @@ using UnityEngine;
 
 public class TrashBin : MonoBehaviour
 {
-    public TrashBinData trashBinData; // ScriptableObject to define the bin's properties
+    public TrashBinData trashBinData;
     public Checkpoint4Handler checkpoint4Handler;
 
     [Header("Interaction")]
-    public float interactionRadius = 1.5f; // Interaction radius
-    public KeyCode interactKey = KeyCode.E; // Key for interacting with the trash bin
+    public float interactionRadius = 1.5f;
+    public KeyCode interactKey = KeyCode.E;
+    
+    
+    public TrashBin[] trashBins;
+
+    // Add a static flag to track if we're currently processing trash
+    private static bool isProcessingTrash = false;
+    private void Start()
+    {
+        trashBins = FindObjectsOfType<TrashBin>();
+    }
 
     private void Update()
     {
         if (Input.GetKeyDown(interactKey))
         {
+            // If we're already processing trash, skip
+            if (isProcessingTrash) return;
+
             // Find all TrashBin scripts in the scene
             TrashBin[] trashBins = FindObjectsOfType<TrashBin>();
-
             // Find the closest TrashBin to the player
             TrashBin closestBin = null;
             float closestDistance = float.MaxValue;
@@ -40,65 +52,60 @@ public class TrashBin : MonoBehaviour
             }
 
             // Check if player is close enough and has trash
-            if (closestBin != null && closestDistance <= 3f && player.carriedTrash.Count > 0)
+            if (closestBin != null && closestDistance <= 3f)
             {
-                TrashData carriedTrash = player.carriedTrash[0];
-
-                Debug.Log($"Closest Bin: {closestBin.trashBinData.binName}");
-                Debug.Log($"Carried Trash Type: {carriedTrash.trashType}");
-                Debug.Log($"Bin Accepted Type: {closestBin.trashBinData.acceptedType}");
-
-                if (carriedTrash.trashType == closestBin.trashBinData.acceptedType)
+                Debug.Log($"masuk closestBin {closestBin} and closest Distance");
+                // Check first slot for trash
+                Transform firstSlot = player.trashSlots[0];
+                if (firstSlot.childCount > 0)
                 {
-                    checkpoint4Handler.OnTrashDisposed();
-                    ScoreManager.Instance.AddScore(closestBin.trashBinData.pointsForCorrectTrash);
-                    Debug.Log("Correct trash deposited!");
+                    Trash trashObject = firstSlot.GetChild(0).GetComponent<Trash>();
+                    if (trashObject != null)
+                    {
+                        // Set the flag before processing
+                        isProcessingTrash = true;
+                        ProcessTrash(player, trashObject, closestBin);
+                        // Reset the flag after a short delay
+                        StartCoroutine(ResetProcessingFlag());
+                    }
                 }
-                else
-                {
-                    checkpoint4Handler.OnTrashDisposed();
-                    ScoreManager.Instance.AddScore(closestBin.trashBinData.penaltyForWrongTrash);
-                    Debug.Log("Wrong trash deposited!");
-                }
-
-                // Remove the trash from the player's inventory
-                player.carriedTrash.RemoveAt(0);
-                player.carriedTrashObjects.RemoveAt(0);
+                if (player == null) return;
             }
         }
     }
 
-    private void DepositTrash(PlayerMovement player)
+    private IEnumerator ResetProcessingFlag()
     {
-        TrashData carriedTrash = player.carriedTrash[0]; // Assume the player deposits the first trash in their list
+        // Wait for a short time to ensure all potential calls have completed
+        yield return new WaitForSeconds(0.1f);
+        isProcessingTrash = false;
+    }
 
-        if (carriedTrash.trashType == trashBinData.acceptedType)
+    private void ProcessTrash(PlayerMovement player, Trash trashObject, TrashBin closestBin)
+    {
+        bool isCorrectBin = trashObject.trashData.trashType == closestBin.trashBinData.acceptedType;
+
+        // Update score and checkpoint
+        if (isCorrectBin)
         {
-            // Correct trash deposited
             ScoreManager.Instance.AddScore(trashBinData.pointsForCorrectTrash);
-            Debug.Log($"Correct! {carriedTrash.trashName} placed in {trashBinData.binName}.");
-
-            // Remove the trash from the player's inventory
-            player.carriedTrash.RemoveAt(0);
-            player.carriedTrashObjects.RemoveAt(0);
+            Debug.Log($"Correct bin! +{trashBinData.pointsForCorrectTrash} points");
         }
         else
         {
-            // Wrong trash deposited
             ScoreManager.Instance.AddScore(trashBinData.penaltyForWrongTrash);
-            Debug.Log($"Wrong! {carriedTrash.trashName} does not belong in {trashBinData.binName}.");
-
-            // Remove the trash from the player's inventory
-            player.carriedTrash.RemoveAt(0);
-            player.carriedTrashObjects.RemoveAt(0);
+            Debug.Log($"Wrong bin! {trashBinData.penaltyForWrongTrash} points");
         }
+        player.DestroyFirstTrash();
+        checkpoint4Handler?.OnTrashDisposed();
 
-        Debug.Log($"Trash deposited into {trashBinData.binName}. Remaining trash: {player.carriedTrash.Count}");
+        // Destroy the trash object and shift remaining trash
+        //Destroy(trashObject.gameObject);
+        // player.ShiftTrashAfterDisposal();
     }
 
     private void OnDrawGizmosSelected()
     {
-        // Draw interaction radius in the editor
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactionRadius);
     }
