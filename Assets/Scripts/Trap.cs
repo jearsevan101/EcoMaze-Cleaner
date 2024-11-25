@@ -81,11 +81,11 @@ public class Trap : MonoBehaviour
     private void Start()
     {
         audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
-        {
-            audioSource = gameObject.AddComponent<AudioSource>();
-            Debug.LogWarning("No AudioSource component found on trap object!");
-        }
+        //if (audioSource == null)
+        //{
+        //    audioSource = gameObject.AddComponent<AudioSource>();
+        //    Debug.LogWarning("No AudioSource component found on trap object!");
+        //}   
     }
 
     private void playTrapSound()
