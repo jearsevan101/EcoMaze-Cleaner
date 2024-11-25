@@ -14,11 +14,16 @@ public class TrashBin : MonoBehaviour
     
     public TrashBin[] trashBins;
 
+    [Header("Audio")]
+    public AudioClip trashSound;
+    public AudioSource audioSource;
+
     // Add a static flag to track if we're currently processing trash
     private static bool isProcessingTrash = false;
     private void Start()
     {
         trashBins = FindObjectsOfType<TrashBin>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()
@@ -51,6 +56,8 @@ public class TrashBin : MonoBehaviour
                 }
             }
 
+            
+
             // Check if player is close enough and has trash
             if (closestBin != null && closestDistance <= 3f)
             {
@@ -66,6 +73,7 @@ public class TrashBin : MonoBehaviour
                         isProcessingTrash = true;
                         ProcessTrash(player, trashObject, closestBin);
                         // Reset the flag after a short delay
+                        closestBin.playTrashSFX();
                         StartCoroutine(ResetProcessingFlag());
                     }
                 }
@@ -108,5 +116,19 @@ public class TrashBin : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, interactionRadius);
+    }
+
+    private void playTrashSFX()
+    {
+        if (audioSource != null && trashSound != null)
+
+        {
+            Debug.Log("suara masuk dimainkan");
+            audioSource.PlayOneShot(trashSound);
+        }
+        else
+        {
+            Debug.LogWarning("No AudioSource or AudioClip specified for TrashBin!");
+        }
     }
 }
