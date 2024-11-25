@@ -6,7 +6,7 @@ public class Checkpoint3Handler : MonoBehaviour
 {
     // Start is called before the first frame update
     public ChecklistManager checklistManager;
-    public int requiredTrashPickup = 2;
+    public int requiredTrashPickup = 4;
     private int currentTrashPickup = 0;
     public PlayerMovement playerMovement;
     public void OnTrashPickedUp()

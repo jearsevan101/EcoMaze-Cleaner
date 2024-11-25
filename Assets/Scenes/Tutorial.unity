@@ -8329,7 +8329,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Press E to grab the trash
 
-    2 / 2 grabbed'
+    4 / 4 grabbed'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8982,7 +8982,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   checklistManager: {fileID: 1787239360}
-  requiredTrashPickup: 2
+  requiredTrashPickup: 4
   playerMovement: {fileID: 1467653647}
 --- !u!114 &1467653646
 MonoBehaviour:
