@@ -2367,6 +2367,7 @@ MonoBehaviour:
   slowMultiplier: 0.5
   freezeDuration: 5
   teleportDestinationParent: {fileID: 1135135592}
+  trapSound: {fileID: 8300000, guid: 75d317a73936a394683a75c3287ebf45, type: 3}
 --- !u!65 &376898452
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3485,6 +3486,7 @@ MonoBehaviour:
   slowMultiplier: 0.5
   freezeDuration: 5
   teleportDestinationParent: {fileID: 1135135592}
+  trapSound: {fileID: 8300000, guid: fe9d5419ca0f6eb479ea841c99c69633, type: 3}
 --- !u!65 &550049712
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6506,6 +6508,7 @@ MonoBehaviour:
   slowMultiplier: 0.5
   freezeDuration: 5
   teleportDestinationParent: {fileID: 1135135592}
+  trapSound: {fileID: 8300000, guid: 874226a8962574642bb3745d4d4874e7, type: 3}
 --- !u!65 &1083746734
 BoxCollider:
   m_ObjectHideFlags: 0
