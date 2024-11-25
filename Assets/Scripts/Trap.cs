@@ -12,6 +12,10 @@ public class Trap : MonoBehaviour
     public float freezeDuration = 5f;    // Duration of freeze effect
 
     public Transform teleportDestinationParent; // Parent object containing teleport destinations
+    
+    // setup audio for the trap
+    private AudioSource audioSource;
+    public AudioClip trapSound;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -26,12 +30,15 @@ public class Trap : MonoBehaviour
                 {
                     case TrapType.Freeze:
                         StartCoroutine(ApplyFreezeEffect(player));
+                        playTrapSound();
                         break;
                     case TrapType.Slow:
                         StartCoroutine(ApplySlowEffect(player));
+                        playTrapSound();
                         break;
                     case TrapType.Teleport:
                         ApplyTeleportEffect(player);
+                        playTrapSound();
                         break;
                 }
             }
@@ -68,6 +75,24 @@ public class Trap : MonoBehaviour
         else
         {
             Debug.LogWarning("No teleport destinations available!");
+        }
+    }
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            Debug.LogWarning("No AudioSource component found on trap object!");
+        }
+    }
+
+    private void playTrapSound()
+    {
+        if (trapSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(trapSound);
         }
     }
 }
