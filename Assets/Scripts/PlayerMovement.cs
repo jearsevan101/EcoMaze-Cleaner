@@ -49,6 +49,11 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 moveDirection;
     private Rigidbody rb;
 
+    [Header("Wall Jump")]
+    public float wallCheckDistance = 0.5f; // Distance to check for walls
+    public LayerMask wallLayer; // Layer for walls
+    private bool isNearWall;
+
     [Header("UI")]
     public TextMeshProUGUI statusText;
     [Header("Interaction")]
@@ -94,7 +99,13 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
+        grounded = Physics.Raycast(
+            transform.position,
+            Vector3.down,
+            playerHeight * 0.5f + 0.2f,
+            whatIsGround | wallLayer  // Combine ground and wall layers
+        );
+        isNearWall = CheckForWalls();
 
         if (canMove)
         {
@@ -129,6 +140,14 @@ public class PlayerMovement : MonoBehaviour
         RotateObjectParent(); // Rotate objectParent
         HandleInteraction(); // Check for trash pickup
         HandleDrop(); // Add this new method call
+    }
+    private bool CheckForWalls()
+    {
+        // Check for walls in multiple directions
+        return Physics.Raycast(transform.position, orientation.forward, wallCheckDistance, wallLayer) ||
+               Physics.Raycast(transform.position, -orientation.forward, wallCheckDistance, wallLayer) ||
+               Physics.Raycast(transform.position, orientation.right, wallCheckDistance, wallLayer) ||
+               Physics.Raycast(transform.position, -orientation.right, wallCheckDistance, wallLayer);
     }
     private void HandleDrop()
     {
@@ -287,11 +306,47 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetKey(jumpKey) && readyToJump && grounded)
         {
             readyToJump = false;
-
             Jump();
-
             Invoke(nameof(ResetJump), jumpCooldown);
         }
+    }
+    private void WallJump()
+    {
+        // Reset y velocity
+        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+
+        // Determine wall jump direction
+        Vector3 wallJumpDirection = DetermineWallJumpDirection();
+
+        // Apply upward force
+        rb.AddForce(Vector3.up * jumpForce * 1.2f, ForceMode.Impulse);
+
+        // Apply horizontal force away from the wall
+        if (wallJumpDirection != Vector3.zero)
+        {
+            rb.AddForce(wallJumpDirection * jumpForce * 0.8f, ForceMode.Impulse);
+        }
+
+        // Play jump sound
+        if (jumpAudioSource != null && jumpClip != null)
+        {
+            jumpAudioSource.PlayOneShot(jumpClip);
+        }
+    }
+
+    private Vector3 DetermineWallJumpDirection()
+    {
+        // Check wall directions and return appropriate jump vector
+        if (Physics.Raycast(transform.position, orientation.forward, wallCheckDistance, wallLayer))
+            return -orientation.forward;
+        if (Physics.Raycast(transform.position, -orientation.forward, wallCheckDistance, wallLayer))
+            return orientation.forward;
+        if (Physics.Raycast(transform.position, orientation.right, wallCheckDistance, wallLayer))
+            return -orientation.right;
+        if (Physics.Raycast(transform.position, -orientation.right, wallCheckDistance, wallLayer))
+            return orientation.right;
+
+        return Vector3.zero;
     }
 
     private void MovePlayer()

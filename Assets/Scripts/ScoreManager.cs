@@ -6,6 +6,7 @@ using UnityEngine;
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance; // Singleton instance
+    [SerializeField] private int currentLevel;
 
     [Header("Scoring")]
     private int currentScore;
@@ -18,7 +19,7 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timerDisplay;
 
     [Header("Game Settings")]
-    [SerializeField] private float gameTime = 12f;
+    [SerializeField] private float gameTime;
     [SerializeField] private GameObject trashParent;
 
     private float currentTime;
@@ -60,7 +61,14 @@ public class ScoreManager : MonoBehaviour
             UpdateTimerDisplay();
         }
     }
+    private void OnLevelComplete()
+    {
+        // Unlock the next level and save current score and time
+        LevelManager.Instance.UnlockNextLevel(currentLevel, currentScore, currentTime);
 
+        // Optionally, load the main menu or next level
+        Loader.Load(Loader.Scene.MainMenu);
+    }
     private void UpdateTimerDisplay()
     {
         if (timerDisplay != null)
@@ -74,21 +82,34 @@ public class ScoreManager : MonoBehaviour
     private void EndGame()
     {
         isGameRunning = false;
+
+        // Update timerDisplay and scoreDisplay
+        timerDisplay.text = "Time's Up!";
+        scoreDisplay.text = currentScore > (5 * 70 * totalTrash / 100)
+            ? "You Win! Final Score: " + currentScore
+            : "You Lose! Final Score: " + currentScore;
+
+        Debug.Log(currentScore > (5 * 70 * totalTrash / 100)
+            ? "You Win! Final Score: " + currentScore
+            : "You Lose! Final Score: " + currentScore);
+
+        StartCoroutine(DelayedEndGame());
+    }
+
+    private IEnumerator DelayedEndGame()
+    {
+        yield return new WaitForSeconds(5);
+        Debug.Log("Game Over! Final Score: " + currentScore);
+
         if (currentScore > (5 * 70 * totalTrash / 100))
         {
-            // Update both timerDisplay and scoreDisplay
-            timerDisplay.text = "Time's Up!";
-            scoreDisplay.text = "You Win! Final Score: " + currentScore;
-            Debug.Log("You Win! Final Score: " + currentScore);
+            OnLevelComplete();
         }
         else
         {
-            // Update both timerDisplay and scoreDisplay
-            timerDisplay.text = "Time's Up!";
-            scoreDisplay.text = "You Lose! Final Score: " + currentScore;
-            Debug.Log("You Lose! Final Score: " + currentScore);
+            Loader.Load(Loader.Scene.MainMenu);
         }
-        Debug.Log("Game Over! Final Score: " + currentScore);
+
     }
 
     public void AddScore(int points)

@@ -5,11 +5,19 @@ public static class Loader
     {
         MainMenu,
         MainGame,
-        Tutorial
+        Tutorial,
+        Level0,
+        Level1,
+        Level2,
+        Level3
     }
 
     public static void Load(Scene targetScene)
     {
         SceneManager.LoadScene(targetScene.ToString());
+    }
+    public static void LoadString(string targetScene)
+    {
+        SceneManager.LoadScene(targetScene);
     }
 }
