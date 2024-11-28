@@ -1615,19 +1615,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 246840624}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2114201177}
-        m_TargetAssemblyTypeName: PauseMenuController, Assembly-CSharp
-        m_MethodName: ResumeGame
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &246840624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5911,7 +5899,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 2114201176}
   backgroundBlur: {fileID: 175241244}
-  audioSources: []
+  resumeButton: {fileID: 246840623}
+  restartButton: {fileID: 1764689425}
+  quitButton: {fileID: 863138906}
 --- !u!1 &972032689
 GameObject:
   m_ObjectHideFlags: 0
@@ -9371,7 +9361,7 @@ GameObject:
   - component: {fileID: 1764689426}
   - component: {fileID: 1764689425}
   m_Layer: 5
-  m_Name: MainMenu
+  m_Name: RestartButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9441,7 +9431,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2114201177}
+      - m_Target: {fileID: 971177542}
         m_TargetAssemblyTypeName: PauseMenuController, Assembly-CSharp
         m_MethodName: RestartGame
         m_Mode: 1
@@ -9452,7 +9442,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 2
+        m_CallState: 1
 --- !u!114 &1764689426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11736,8 +11726,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 2114201176}
   backgroundBlur: {fileID: 175241244}
-  audioSources:
-  - {fileID: 1334189749}
+  resumeButton: {fileID: 246840623}
+  restartButton: {fileID: 1764689425}
+  quitButton: {fileID: 863138906}
 --- !u!114 &2114201178
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11958,11 +11949,11 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1808288353}
+  - {fileID: 1751685504}
   - {fileID: 2114201181}
   - {fileID: 1939280403}
   - {fileID: 1526508876}
   - {fileID: 971177541}
-  - {fileID: 1751685504}
   - {fileID: 845805494}
   - {fileID: 549234188}
   - {fileID: 978466343}
