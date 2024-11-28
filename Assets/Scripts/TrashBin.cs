@@ -56,8 +56,6 @@ public class TrashBin : MonoBehaviour
                 }
             }
 
-            
-
             // Check if player is close enough and has trash
             if (closestBin != null && closestDistance <= 3f)
             {
@@ -84,7 +82,6 @@ public class TrashBin : MonoBehaviour
 
     private IEnumerator ResetProcessingFlag()
     {
-        // Wait for a short time to ensure all potential calls have completed
         yield return new WaitForSeconds(0.1f);
         isProcessingTrash = false;
     }
@@ -107,9 +104,6 @@ public class TrashBin : MonoBehaviour
         player.DestroyFirstTrash();
         checkpoint4Handler?.OnTrashDisposed();
 
-        // Destroy the trash object and shift remaining trash
-        //Destroy(trashObject.gameObject);
-        // player.ShiftTrashAfterDisposal();
     }
 
     private void OnDrawGizmosSelected()

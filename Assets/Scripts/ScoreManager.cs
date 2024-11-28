@@ -18,6 +18,9 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI trashRemaining;
     [SerializeField] private TextMeshProUGUI timerDisplay;
 
+
+    [SerializeField] private PopUpUI popUpFinished;
+
     [Header("Game Settings")]
     [SerializeField] private float gameTime;
     [SerializeField] private GameObject trashParent;
@@ -27,6 +30,7 @@ public class ScoreManager : MonoBehaviour
 
     private void Awake()
     {
+        popUpFinished.gameObject.SetActive(false);
         if (Instance == null)
         {
             Instance = this;
@@ -59,15 +63,21 @@ public class ScoreManager : MonoBehaviour
             }
 
             UpdateTimerDisplay();
+            if (remainingTrash == 0)
+            {
+                EndGame();
+            }
         }
+    }
+
+    public int GetCurrentLevel()
+    {
+        return currentLevel;
     }
     private void OnLevelComplete()
     {
         // Unlock the next level and save current score and time
         LevelManager.Instance.UnlockNextLevel(currentLevel, currentScore, currentTime);
-
-        // Optionally, load the main menu or next level
-        Loader.Load(Loader.Scene.MainMenu);
     }
     private void UpdateTimerDisplay()
     {
@@ -82,35 +92,31 @@ public class ScoreManager : MonoBehaviour
     private void EndGame()
     {
         isGameRunning = false;
+        popUpFinished.gameObject.SetActive(true);
 
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         // Update timerDisplay and scoreDisplay
         timerDisplay.text = "Time's Up!";
         scoreDisplay.text = currentScore > (5 * 70 * totalTrash / 100)
             ? "You Win! Final Score: " + currentScore
             : "You Lose! Final Score: " + currentScore;
-
-        Debug.Log(currentScore > (5 * 70 * totalTrash / 100)
-            ? "You Win! Final Score: " + currentScore
-            : "You Lose! Final Score: " + currentScore);
-
-        StartCoroutine(DelayedEndGame());
-    }
-
-    private IEnumerator DelayedEndGame()
-    {
-        yield return new WaitForSeconds(5);
-        Debug.Log("Game Over! Final Score: " + currentScore);
-
         if (currentScore > (5 * 70 * totalTrash / 100))
         {
+            popUpFinished.updateScore(GetScore());
+            popUpFinished.updateSuccessInfo(true);
             OnLevelComplete();
         }
         else
         {
-            Loader.Load(Loader.Scene.MainMenu);
+            popUpFinished.updateScore(GetScore());
+            popUpFinished.updateSuccessInfo(false);
         }
-
+        Debug.Log(currentScore > (5 * 70 * totalTrash / 100)
+            ? "You Win! Final Score: " + currentScore
+            : "You Lose! Final Score: " + currentScore);
     }
+
 
     public void AddScore(int points)
     {

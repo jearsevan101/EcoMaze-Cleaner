@@ -20,7 +20,6 @@ public class Checkpoint4Handler : MonoBehaviour
             // buat step4 teks jadi strikethrough
             checklistManager.step4.fontStyle = TMPro.FontStyles.Strikethrough;
             // ganti image step 4 dengan gameobjek checklistimage3
-            checklistManager.checklistStep4Image.gameObject.SetActive(true);
             checklistManager.CompleteCurrentStep();
         }
     }

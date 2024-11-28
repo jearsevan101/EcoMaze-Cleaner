@@ -259,7 +259,6 @@ public class PlayerMovement : MonoBehaviour
             trashTransform.SetParent(trashParent);
             trashTransform.position = finalDropPosition;
             trashTransform.rotation = Quaternion.identity;
-            trashTransform.localScale = Vector3.one * 3f; // Set the scale to 3
 
             // Enable physics and collider for the dropped object
             Rigidbody trashRb = trashTransform.GetComponent<Rigidbody>();
@@ -431,7 +430,7 @@ public class PlayerMovement : MonoBehaviour
                     closestTrash.transform.SetParent(emptySlot);
                     closestTrash.transform.localPosition = new Vector3(0f, 0f, 1f);
                     closestTrash.transform.localRotation = Quaternion.identity;
-                    closestTrash.transform.localScale = closestTrash.transform.localScale * 0.5f;
+                    
 
                     // Disable physics on the trash object
                     Rigidbody trashRb = closestTrash.GetComponent<Rigidbody>();
