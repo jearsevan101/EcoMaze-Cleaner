@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PauseMenuController : MonoBehaviour
 {
@@ -8,6 +9,20 @@ public class PauseMenuController : MonoBehaviour
 
     private bool isPaused = false;
 
+    [SerializeField] private Button resumeButton;
+    [SerializeField] private Button restartButton;
+    [SerializeField] private Button quitButton;
+
+
+    private void Start()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        //resumeButton.onClick.AddListener(ResumeGame);
+        //restartButton.onClick.AddListener(RestartGame);
+        //quitButton.onClick.AddListener(QuitGame);
+    }
 
     void Update()
     {
@@ -32,8 +47,12 @@ public class PauseMenuController : MonoBehaviour
     {
         pauseMenuUI.SetActive(true);
         backgroundBlur.SetActive(true);
+        Cursor.visible = true; // Show cursor
+        Cursor.lockState = CursorLockMode.None; // Unlock cursor
         Debug.Log("Game Paused!");
         Time.timeScale = 0f; // Freeze game
+
+
         isPaused = true;
     }
 
@@ -43,6 +62,11 @@ public class PauseMenuController : MonoBehaviour
         backgroundBlur.SetActive(false);
 
         Time.timeScale = 1f; // Resume game
+
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+
+        Debug.Log("BUTTON RESUME GAME PRESSED");
 
         isPaused = false;
     }
@@ -56,7 +80,19 @@ public class PauseMenuController : MonoBehaviour
     public void QuitGame()
     {
         Time.timeScale = 1f; // Reset time scale before quitting
-        Application.Quit(); // Quit application
+        Loader.Load(Loader.Scene.MainMenu); // Load Main Menu scene
         Debug.Log("Game Quit!"); // Log for editor testing
+    }
+
+    private void Awake()
+    {
+        resumeButton.onClick.AddListener(() =>
+        {
+            ResumeGame();
+        });
+
+        restartButton.onClick.AddListener(RestartGame);
+
+        quitButton.onClick.AddListener(QuitGame);
     }
 }
