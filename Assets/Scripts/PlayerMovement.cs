@@ -35,6 +35,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform trashSlot3;
     [SerializeField] private Transform trashSlot4;
 
+    [SerializeField] private Vector3 initalTrashScale;
+
     // Make trashSlots public so TrashBin can access it
     public Transform[] trashSlots { get; private set; }
     [Header("Drop Setting")]
@@ -259,6 +261,7 @@ public class PlayerMovement : MonoBehaviour
             trashTransform.SetParent(trashParent);
             trashTransform.position = finalDropPosition;
             trashTransform.rotation = Quaternion.identity;
+            trashTransform.localScale = initalTrashScale; // Set the scale to 3
 
             // Enable physics and collider for the dropped object
             Rigidbody trashRb = trashTransform.GetComponent<Rigidbody>();
@@ -430,7 +433,8 @@ public class PlayerMovement : MonoBehaviour
                     closestTrash.transform.SetParent(emptySlot);
                     closestTrash.transform.localPosition = new Vector3(0f, 0f, 1f);
                     closestTrash.transform.localRotation = Quaternion.identity;
-                    
+                    initalTrashScale = closestTrash.transform.localScale;
+                    closestTrash.transform.localScale = closestTrash.transform.localScale * 0.5f;
 
                     // Disable physics on the trash object
                     Rigidbody trashRb = closestTrash.GetComponent<Rigidbody>();
