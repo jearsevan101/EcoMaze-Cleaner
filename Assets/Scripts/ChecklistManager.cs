@@ -21,7 +21,7 @@ public class ChecklistManager: MonoBehaviour
     public GameObject step3obj;
     public GameObject step4obj;
 
-    private int currentStep = 0;
+    private int currentStep = 1;
 
     private void Start()
     {
@@ -47,7 +47,7 @@ public class ChecklistManager: MonoBehaviour
 
     public void CompleteCurrentStep()
     {
-        currentStep++;
+        //currentStep++;
 
         switch (currentStep)
         {
@@ -73,5 +73,7 @@ public class ChecklistManager: MonoBehaviour
                 step4obj.SetActive(true);
                 break;
         }
+
+        currentStep++;
     }
 }

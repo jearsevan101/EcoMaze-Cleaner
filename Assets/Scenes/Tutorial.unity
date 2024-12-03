@@ -1297,6 +1297,7 @@ MonoBehaviour:
   trashSlot2: {fileID: 0}
   trashSlot3: {fileID: 0}
   trashSlot4: {fileID: 0}
+  initalTrashScale: {x: 0, y: 0, z: 0}
   trashParent: {fileID: 0}
   dropDistance: 2
   dropHeightCheck: 1
@@ -10502,6 +10503,7 @@ MonoBehaviour:
   trashSlot2: {fileID: 1665776972}
   trashSlot3: {fileID: 1963237737}
   trashSlot4: {fileID: 248764390}
+  initalTrashScale: {x: 0, y: 0, z: 0}
   trashParent: {fileID: 584754539}
   dropDistance: 2
   dropHeightCheck: 1
