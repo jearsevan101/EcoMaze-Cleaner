@@ -1237,6 +1237,7 @@ MonoBehaviour:
   trashSlot2: {fileID: 0}
   trashSlot3: {fileID: 0}
   trashSlot4: {fileID: 0}
+  initalTrashScale: {x: 0, y: 0, z: 0}
   trashParent: {fileID: 0}
   dropDistance: 2
   dropHeightCheck: 1
@@ -1246,8 +1247,19 @@ MonoBehaviour:
   collisionCheckMask2:
     serializedVersion: 2
     m_Bits: 0
+  wallCheckDistance: 0.5
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 0
   statusText: {fileID: 0}
   pickupRadius: 1.5
+  walkingAudioSource: {fileID: 0}
+  jumpAudioSource: {fileID: 0}
+  grabAudioSource: {fileID: 0}
+  walkingClip: {fileID: 0}
+  jumpClip: {fileID: 0}
+  grabClip: {fileID: 0}
+  dropClip: {fileID: 0}
 --- !u!114 &207356008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1775,9 +1787,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 187d529a32a07eb429e67a396c5c91d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentLevel: 0
   scoreDisplay: {fileID: 1351982638}
   trashRemaining: {fileID: 608826674}
   timerDisplay: {fileID: 464194484}
+  popUpFinished: {fileID: 0}
   gameTime: 12
   trashParent: {fileID: 584754538}
 --- !u!114 &287874303
@@ -2434,6 +2448,7 @@ MonoBehaviour:
   slowMultiplier: 0.5
   freezeDuration: 5
   teleportDestinationParent: {fileID: 1135135592}
+  trapSound: {fileID: 0}
 --- !u!65 &376898452
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3531,6 +3546,7 @@ MonoBehaviour:
   slowMultiplier: 0.5
   freezeDuration: 5
   teleportDestinationParent: {fileID: 1135135592}
+  trapSound: {fileID: 0}
 --- !u!65 &550049712
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7114,6 +7130,7 @@ MonoBehaviour:
   slowMultiplier: 0.5
   freezeDuration: 5
   teleportDestinationParent: {fileID: 1135135592}
+  trapSound: {fileID: 0}
 --- !u!65 &1083746734
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9413,6 +9430,7 @@ MonoBehaviour:
   trashSlot2: {fileID: 1665776972}
   trashSlot3: {fileID: 1963237737}
   trashSlot4: {fileID: 248764390}
+  initalTrashScale: {x: 0, y: 0, z: 0}
   trashParent: {fileID: 584754539}
   dropDistance: 2
   dropHeightCheck: 1
@@ -9422,8 +9440,19 @@ MonoBehaviour:
   collisionCheckMask2:
     serializedVersion: 2
     m_Bits: 512
+  wallCheckDistance: 0.5
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 256
   statusText: {fileID: 1003293229}
   pickupRadius: 1.5
+  walkingAudioSource: {fileID: 0}
+  jumpAudioSource: {fileID: 0}
+  grabAudioSource: {fileID: 0}
+  walkingClip: {fileID: 0}
+  jumpClip: {fileID: 0}
+  grabClip: {fileID: 0}
+  dropClip: {fileID: 0}
 --- !u!54 &1467653648
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -11345,7 +11374,6 @@ MonoBehaviour:
   step2: {fileID: 284680925}
   step3: {fileID: 30551616}
   step4: {fileID: 302438770}
-  step5: {fileID: 0}
   checkliststep1: {fileID: 1675740157}
   checkliststep2: {fileID: 0}
   checkliststep3: {fileID: 0}
