@@ -98,21 +98,22 @@ public class ScoreManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         // Update timerDisplay and scoreDisplay
         timerDisplay.text = "Time's Up!";
-        scoreDisplay.text = currentScore > (5 * 70 * totalTrash / 100)
+        int minimumScore = 5 * 70 * totalTrash / 100;
+        scoreDisplay.text = currentScore > minimumScore
             ? "You Win! Final Score: " + currentScore
             : "You Lose! Final Score: " + currentScore;
-        if (currentScore > (5 * 70 * totalTrash / 100))
+        if (currentScore > minimumScore)
         {
-            popUpFinished.updateScore(GetScore());
+            popUpFinished.updateScore(GetScore(), minimumScore);
             popUpFinished.updateSuccessInfo(true);
             OnLevelComplete();
         }
         else
         {
-            popUpFinished.updateScore(GetScore());
+            popUpFinished.updateScore(GetScore(), minimumScore);
             popUpFinished.updateSuccessInfo(false);
         }
-        Debug.Log(currentScore > (5 * 70 * totalTrash / 100)
+        Debug.Log(currentScore > minimumScore
             ? "You Win! Final Score: " + currentScore
             : "You Lose! Final Score: " + currentScore);
     }

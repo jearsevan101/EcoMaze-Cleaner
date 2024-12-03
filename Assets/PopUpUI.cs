@@ -41,9 +41,9 @@ public class PopUpUI : MonoBehaviour
         });
     }
 
-    public void updateScore(int Score)
+    public void updateScore(int Score, int RequiredScore)
     {
-        scoreText.text = "Total Score: " + Score.ToString();    
+        scoreText.text = "Total Score: " + Score.ToString() +" / " + RequiredScore.ToString();    
     }
     public void updateSuccessInfo(bool isWinning)
     {
