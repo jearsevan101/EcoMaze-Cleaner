@@ -8,7 +8,6 @@ public class ChecklistManager: MonoBehaviour
     public TextMeshProUGUI step2;
     public TextMeshProUGUI step3;
     public TextMeshProUGUI step4;
-    public TextMeshProUGUI step5;
     public TextMeshProUGUI checkliststep1;
     public TextMeshProUGUI checkliststep2;
     public TextMeshProUGUI checkliststep3;
@@ -50,8 +49,8 @@ public class ChecklistManager: MonoBehaviour
     {
         currentStep++;
 
-        switch(currentStep)
-            {
+        switch (currentStep)
+        {
             case 1:
                 Debug.Log("Step 1 completed!");
                 //step1.gameObject.SetActive(false);
@@ -72,8 +71,7 @@ public class ChecklistManager: MonoBehaviour
                 Debug.Log("Step 3 Completed!");
                 step3obj.SetActive(false);
                 step4obj.SetActive(true);
-                checklistStep4Image.gameObject.SetActive(false);
                 break;
-            }
+        }
     }
 }

@@ -20,4 +20,9 @@ public static class Loader
     {
         SceneManager.LoadScene(targetScene);
     }
+    public static void RetryGame()
+    {
+        // Get the active scene and reload it
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 }
