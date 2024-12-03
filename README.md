@@ -41,20 +41,20 @@
 
 ---
 
-## 🚀 Installation
+## 🚀 How To Play
 
 1. Clone the repository:  
    ```bash
    git clone https://github.com/jearsevan101/EcoMaze-Cleaner.git
    ```
-2. Open the project in Unity.  
-3. Build and run the game on your PC.  
+2. Open Folder "APK_Ready"
+3. Open APK "Eco Maze Cleaner"
 
 ---
 
 ## 🌟 Contributors
 
-- Muhammad Al Ghifari Fausta ([GitHub Profile]((https://github.com/mastamaru)))  
+- Muhammad Al Ghifari Fausta ([GitHub Profile](https://github.com/mastamaru))  
 - Julius Evan Adipramana Raharja Suryanto ([GitHub Profile](https://github.com/jearsevan101))  
 
 ---
