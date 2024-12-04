@@ -43,7 +43,7 @@
 
 ## 🚀 How To Play
 
-1. Download zip file from ([GAME DRIVE](https://drive.google.com/drive/folders/1U4VfA0pOGZG6cSO9SyfjJlae29IMGEe9?usp=sharing)
+1. Download zip file from ([GAME DRIVE](https://drive.google.com/drive/folders/1U4VfA0pOGZG6cSO9SyfjJlae29IMGEe9?usp=sharing))
 2. Unzip the file 
 3. Open APK "Eco Maze Cleaner"
 
@@ -60,8 +60,7 @@
 
 ### Sources for Assets
 
-**ASSETS.md**:
-```markdown
+
 # Assets References
 
 ## Models
